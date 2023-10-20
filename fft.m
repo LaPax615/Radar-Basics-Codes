@@ -16,6 +16,24 @@ frequencies = fs * (-N_samples/2:N_samples/2-1) / N_samples;  % Frequency vector
 fi = beta * t;
 y = cos(2 * pi * fc * t + beta * pi * t.^2);
 
+
+
+
+Y = fft(y);
+Spectrum = abs(fftshift(Y));
+threshold = max(Spectrum) / sqrt(2);  % Threshold at -3dB
+indices = find(Spectrum > threshold);  % Find indices above the threshold
+bandwidth = frequencies(indices(end)) - frequencies(indices(1));  % Compute the bandwidth
+
+fprintf('The bandwidth of the signal is %f Hz.\n', bandwidth);
+
+
+
+
+
+
+
+
 figure;
 subplot(3, 1, 2);  % Create three subplots vertically, this is the first one
 plot(t, y);
@@ -31,7 +49,6 @@ xlabel('Time (s)')
 ylabel('fi (Hz)')
 grid on
 
-Y = fft(y);
 
 subplot(3, 1, 3);  % This is the third subplot
 plot(frequencies, abs(fftshift(Y)))
