@@ -17,21 +17,13 @@ fi = beta * t;
 y = cos(2 * pi * fc * t + beta * pi * t.^2);
 
 
-
-
 Y = fft(y);
 Spectrum = abs(fftshift(Y));
 threshold = max(Spectrum) / sqrt(2);  % Threshold at -3dB
 indices = find(Spectrum > threshold);  % Find indices above the threshold
-bandwidth = frequencies(indices(end)) - frequencies(indices(1));  % Compute the bandwidth
+bandwidth = (frequencies(indices(end)) - frequencies(indices(1)))/2;  % Compute the bandwidth
 
-fprintf('The bandwidth of the signal is %f Hz.\n', bandwidth);
-
-
-
-
-
-
+fprintf('The bandwidth of the signal is %f MHz.\n', bandwidth/1e6);
 
 
 figure;
