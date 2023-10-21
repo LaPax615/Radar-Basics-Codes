@@ -18,7 +18,7 @@ y = cos(2 * pi * fc * t + beta * pi * t.^2);
 
 delay = 1.6e-4;  % Delay in seconds - should eclater le fourier if it works
 Attenuation = 0.1;  % Attenuation factor minimizes/maximizes
-y_channel = Attenuation * y .* (heaviside(t - delay) - heaviside(t - delay - T));
+y_channel = Attenuation * y .* (heaviside(t - delay));
 
 
 
