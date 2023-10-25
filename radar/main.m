@@ -1,6 +1,6 @@
 close all; clear; clc;
-c = 3e8;
-R_0 = 1e5;
+c = 3e8; %speed of light
+R_0 = 1e5; %initial range
 B = 200e6;   %Frequency range
 T = 0.4e-3;  %Chirp duration
 fs = 512e6;  %Sampling frequency
