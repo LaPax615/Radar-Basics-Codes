@@ -1,21 +1,26 @@
 close all; clear ; clc;
+N_guard = 5; %*******NOT USED YET*******
+Fs = 2e6; %*******NOT USED YET*******
 
-%----Constants declaration----
+%----Object parameters----
 c = 3e8; %speed of light
-R_0 = 1e4; %initial range of the object
-v = 1e6; %velocity of the object
+R_0 = 20; %initial range of the object
+v = 2; %velocity of the object
+
+%----Radar parameters----
 B = 200e6; %frequency range
 F = 512e6; %simulation sampling frequency
 fc = 24e9; %carrier frequency
-K = 2; %number of chirps
-T = 0.4e-3; %chirp duration
 N = 512; %fast time FFT size (aka number of samples per chirp in the matrix)
+K = 256; % Slow-time FFT size (aka number of chirps)
+T = 0.4e-3; %chirp duration -> produce (204800 ≈ 2^18) samples per chirp
 beta = B/T;
 alpha = 0.5; %echo signal amplitude
 t_prime = 0:1/F:(T - 1/F); %time vector one chirp
 t = 0:1/F:(K*T - 1/F); %time vector K chirps
-%delay = @(t) t*.100; %delay = @(t) (2/c)*(R_0 + v*t);
-delay = @(t) (2*R_0)/c + t.*0;
+%delay = @(t) t*.100;
+delay = @(t) (2/c)*(R_0 - v*t);
+%delay = @(t) (2*R_0)/c + t.*0;
 
 %----evolution of the carrier frequency with time: f(t)----
 fi0 = @(t_prime) beta * t_prime;
@@ -35,7 +40,7 @@ transmitted_signal = @(t) cos(2 * pi * fc * t + phi_emitted); %Transmitted signa
 received_signal = @(t) alpha * cos(2 * pi * fc * (t-delay(t)) + phi_received); %echo signal
 video_signal =  @(t) (alpha/2) * exp(-1j * 2 * pi * fc * delay(t)) .* exp(1j * (phi_received - phi_emitted)); %video signal x(t)
 x = video_signal(t);
-x_matrix = reshape(x(1:K*N), K, N);
+x_matrix = reshape(x(1:K*N), N, K); %creating a (N x K) matrix
 range_doppler_map = abs(fft2(x_matrix));
 
 %----Fast fourier transforms computing----
@@ -49,20 +54,22 @@ threshold = max(Spectrum) / sqrt(2);  %Threshold at -3dB
 indices = find(Spectrum > threshold);  %Find indices above the threshold
 bandwidth = (frequencies(indices(end)) - frequencies(indices(1)))/2;  %Compute the bandwidth
 delay_max = T - N/F;
+
+%----Printing----
 fprintf('The bandwidth of the signal is %f MHz.\n', bandwidth/1e6);
 fprintf('T = %f.\n', T);
-fprintf('K = %f. \n', K);
 fprintf('N = %f.\n', N);
+fprintf('K = %f.\n', K);
 fprintf('delay_max = %f.\n\n', delay_max);
 fprintf('N_sample_1_chirp = %f.\n', N_samples_tot/K);
-
+fprintf('N_sample_tot = %f.\n', N_samples_tot);
 
 %----Plotting----
 figure
 colormap(jet); % Or any other colormap of your choice
 imagesc(range_doppler_map);
-xlabel('Doppler Bins');
-ylabel('Range Bins');
+xlabel('x');
+ylabel('y');
 colorbar; % Add a colorbar to the plot
 
 figure;
