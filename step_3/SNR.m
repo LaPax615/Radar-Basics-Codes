@@ -1,4 +1,4 @@
-% Radar Specifications
+% Parametres
 Range_max = 109.1;  % Maximum range in meters
 Range_resolution = 1;  % Range resolution in meters
 Velocity_max = 10;  % Maximum velocity in m/s
