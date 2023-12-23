@@ -1,23 +1,23 @@
-% Radar Specifications
-Range_max = 20;  % Maximum range in meters
-Range_resolution = 1;  % Range resolution in meters
-Velocity_max = 2;  % Maximum velocity in m/s
-c = 3e8;  % Speed of light in m/s
 
-% FMCW Waveform Generation
-B = 200e9;  % Bandwidth
-Tchirp = 1 * (2 * Range_max / c);  % Chirp Time
+Range_max = 20;
+Range_resolution = 1;
+Velocity_max = 2;
+c = 3e8;
+
+% FMCWGeneration
+B = 200e9;
+Tchirp = 1 * (2 * Range_max / c);
 
 disp(Tchirp);
 
 slope = B / Tchirp;
 fc = 24e9;  % Carrier frequency: 24 GHz
 
-K = 256;  % Number of range cells
-N = 512;  % Number of Doppler cells
+K = 256;
+N = 512;
 SweepTime = K * Tchirp;
 
-t = linspace(0, SweepTime, K * N);  % Total time for Nr sweeps
+t = linspace(0, SweepTime, K * N);
 
 % Define multiple targets
 targets = [
@@ -42,19 +42,17 @@ targets = [
 
 %}
 
-% Compute FFT
 
-% Define velocity and range bins based on your data
 velocity_bins = linspace(-Velocity_max, Velocity_max, N);
 range_bins = linspace(-Range_max, Range_max, K);
 
-% Noise power as used in your code
+
 noise_power = 0.01;
-SNRs = [10, 1, 0.01, 0.001, 0.0001, 0.00001];
+SNRs = [10, 1, 0.01, 0.001, 0.0001, 0.00001]; %Pre-log Rations
 
 
 
-% Calculate probabilities and plot
+
 for i = 1:length(SNRs)
     RDM = generate_rdm_for_snr(targets, SNRs(i), K, N, t, fc, c, slope, noise_power);
     subplot(2, 3, i);
@@ -91,7 +89,6 @@ function RDM = generate_rdm_for_snr(targets, SNR, K, N, t, fc, c, slope, noise_p
             Rx_signal = 0.5*0.25*exp(1i * 2 * pi * ((fc + f_doppler) * (t(j) - delay) + 0.5 * slope * (t(j) - delay) ^ 2));
 
             Tx(j) = Tx(j) + Tx_signal;
-            % Adjust noise level based on SNR
             noise = (randn(1) + 1i * randn(1)) * sqrt(noise_power / SNR);
             Rx(j) = Rx(j) + Rx_signal + noise;
             Mix(j) = Mix(j) + Tx_signal * conj(Rx(j));
